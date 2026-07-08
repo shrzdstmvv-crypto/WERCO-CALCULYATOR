@@ -1,101 +1,40 @@
 from kivy.app import App
-from kivy.lang import Builder
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
 
-KV = """
-BoxLayout:
-    orientation: "vertical"
-    padding: 10
-    spacing: 10
 
-    TextInput:
-        id: display
-        text: "0"
-        font_size: 42
-        readonly: True
-        halign: "right"
-        multiline: False
-        size_hint_y: 0.2
+class Calculator(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(orientation="vertical", padding=10, spacing=10, **kwargs)
 
-    GridLayout:
-        cols: 4
-        spacing: 5
+        self.a = TextInput(hint_text="1-son", multiline=False, input_filter="float")
+        self.b = TextInput(hint_text="2-son", multiline=False, input_filter="float")
 
-        Button:
-            text: "7"
-            on_press: app.add("7")
-        Button:
-            text: "8"
-            on_press: app.add("8")
-        Button:
-            text: "9"
-            on_press: app.add("9")
-        Button:
-            text: "/"
-            on_press: app.add("/")
+        self.add_widget(self.a)
+        self.add_widget(self.b)
 
-        Button:
-            text: "4"
-            on_press: app.add("4")
-        Button:
-            text: "5"
-            on_press: app.add("5")
-        Button:
-            text: "6"
-            on_press: app.add("6")
-        Button:
-            text: "*"
-            on_press: app.add("*")
+        btn = Button(text="Hisobla")
+        btn.bind(on_press=self.calculate)
+        self.add_widget(btn)
 
-        Button:
-            text: "1"
-            on_press: app.add("1")
-        Button:
-            text: "2"
-            on_press: app.add("2")
-        Button:
-            text: "3"
-            on_press: app.add("3")
-        Button:
-            text: "-"
-            on_press: app.add("-")
+        self.result = Label(text="Natija: 0")
+        self.add_widget(self.result)
 
-        Button:
-            text: "C"
-            on_press: app.clear()
-
-        Button:
-            text: "0"
-            on_press: app.add("0")
-
-        Button:
-            text: "="
-            on_press: app.calc()
-
-        Button:
-            text: "+"
-            on_press: app.add("+")
-"""
-
-class Calculator(App):
-    def build(self):
-        self.exp = ""
-        return Builder.load_string(KV)
-
-    def add(self, value):
-        if self.exp == "Error":
-            self.exp = ""
-        self.exp += value
-        self.root.ids.display.text = self.exp
-
-    def clear(self):
-        self.exp = ""
-        self.root.ids.display.text = "0"
-
-    def calc(self):
+    def calculate(self, instance):
         try:
-            self.exp = str(eval(self.exp))
+            x = float(self.a.text)
+            y = float(self.b.text)
+            self.result.text = f"Natija: {x + y}"
         except:
-            self.exp = "Error"
-        self.root.ids.display.text = self.exp
+            self.result.text = "Xatolik!"
 
-Calculator().run()
+
+class WercoCalculator(App):
+    def build(self):
+        return Calculator()
+
+
+if __name__ == "__main__":
+    WercoCalculator().run()
