@@ -1,40 +1,38 @@
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 
-
-class Calculator(BoxLayout):
+class Calc(GridLayout):
     def __init__(self, **kwargs):
-        super().__init__(orientation="vertical", padding=10, spacing=10, **kwargs)
-
-        self.a = TextInput(hint_text="1-son", multiline=False, input_filter="float")
-        self.b = TextInput(hint_text="2-son", multiline=False, input_filter="float")
-
-        self.add_widget(self.a)
-        self.add_widget(self.b)
-
-        btn = Button(text="Hisobla")
-        btn.bind(on_press=self.calculate)
-        self.add_widget(btn)
-
-        self.result = Label(text="Natija: 0")
-        self.add_widget(self.result)
-
-    def calculate(self, instance):
-        try:
-            x = float(self.a.text)
-            y = float(self.b.text)
-            self.result.text = f"Natija: {x + y}"
-        except:
-            self.result.text = "Xatolik!"
-
+        super().__init__(cols=4, padding=8, spacing=8, **kwargs)
+        self.expr=""
+        self.display=TextInput(readonly=True,multiline=False,font_size=40,halign="right")
+        self.add_widget(self.display)
+        for _ in range(3):
+            self.add_widget(Button(disabled=True,opacity=0))
+        for t in ["C","⌫","%","/","7","8","9","*","4","5","6","-","1","2","3","+","0",".","=",""]:
+            if t=="":
+                self.add_widget(Button(disabled=True,opacity=0)); continue
+            b=Button(text=t,font_size=28)
+            b.bind(on_press=self.press)
+            self.add_widget(b)
+    def press(self,btn):
+        t=btn.text
+        if t=="C": self.expr=""
+        elif t=="⌫": self.expr=self.expr[:-1]
+        elif t=="=":
+            try:self.expr=str(eval(self.expr))
+            except:self.expr="Error"
+        elif t=="%":
+            try:self.expr=str(float(self.expr)/100)
+            except:self.expr="Error"
+        else:
+            if self.expr=="Error": self.expr=""
+            self.expr+=t
+        self.display.text=self.expr
 
 class WercoCalculator(App):
-    def build(self):
-        return Calculator()
+    def build(self): return Calc()
 
-
-if __name__ == "__main__":
-    WercoCalculator().run()
+WercoCalculator().run()
